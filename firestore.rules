@@ -1,0 +1,44 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Vehicle fleet collection
+    match /vehicles/{vehicleId} {
+      allow read: if true;
+      allow write: if true; // Internal Noor shop operations
+    }
+
+    // Bookings & Rental agreements
+    match /bookings/{bookingId} {
+      allow read: if true;
+      allow write: if true; // Internal Noor shop operations
+    }
+
+    // Business profile settings
+    match /businessProfile/{profileId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // Tour packages
+    match /tours/{tourId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // Daily finances
+    match /dailyFinances/{recordId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // Connection ping test
+    match /_connection_test/{docId} {
+      allow read, write: if true;
+    }
+  }
+}

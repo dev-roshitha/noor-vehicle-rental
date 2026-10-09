@@ -1,0 +1,6 @@
+{
+  "name": "Noor Bike Rentals - Scooty & Vehicle Management",
+  "description": "Comprehensive vehicle and scooty rental operations, customer Day Folders, ID & license verification, fleet profiles, and financial reporting in Sri Lankan Rupees.",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
