@@ -35,12 +35,14 @@ export const FleetToursView: React.FC = () => {
     deleteVehicle,
     selectedVehicleForReturn,
     setSelectedVehicleForReturn,
+    isAddVehicleOpen,
+    setIsAddVehicleOpen,
   } = useApp();
 
   const [statusFilter, setStatusFilter] = useState<'all' | VehicleStatus>('all');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [sortBy, setSortBy] = useState<'newest' | 'rate-low' | 'rate-high' | 'name'>('newest');
-  const [isAddVehicleOpen, setIsAddVehicleOpen] = useState(false);
+  const [vehicleToDelete, setVehicleToDelete] = useState<Vehicle | null>(null);
 
   // Return Widget State (matching Screenshot 2)
   const onRentVehicles = vehicles.filter((v) => v.status === 'on_rent');
@@ -378,10 +380,40 @@ export const FleetToursView: React.FC = () => {
                       e.stopPropagation();
                       setActiveVehicleModal(vehicle);
                     }}
-                    className="w-full py-1.5 rounded-lg bg-[#142136] hover:bg-cyan-600/20 text-slate-300 hover:text-cyan-300 border border-[#203450] text-[11px] font-semibold transition-colors flex items-center justify-center gap-1"
+                    className="flex-1 py-1.5 rounded-lg bg-[#142136] hover:bg-cyan-600/20 text-slate-300 hover:text-cyan-300 border border-[#203450] text-[11px] font-semibold transition-colors flex items-center justify-center gap-1"
                   >
                     <Eye className="w-3 h-3" />
                     <span>View Profile</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    disabled={
+                      vehicle.status === 'on_rent' ||
+                      bookings.some(
+                        (booking) =>
+                          booking.vehicleId === vehicle.id &&
+                          (booking.status === 'On Rent' || booking.status === 'Overdue')
+                      )
+                    }
+                    title={
+                      vehicle.status === 'on_rent' ||
+                      bookings.some(
+                        (booking) =>
+                          booking.vehicleId === vehicle.id &&
+                          (booking.status === 'On Rent' || booking.status === 'Overdue')
+                      )
+                        ? 'Return this vehicle before deleting it'
+                        : `Delete ${vehicle.name}`
+                    }
+                    aria-label={`Delete ${vehicle.name}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setVehicleToDelete(vehicle);
+                    }}
+                    className="py-1.5 px-2 rounded-lg bg-rose-950/40 hover:bg-rose-900/70 text-rose-300 border border-rose-900/60 text-[11px] font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-rose-950/40"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
                   </button>
 
                   {vehicle.status === 'on_rent' && (
@@ -843,6 +875,50 @@ export const FleetToursView: React.FC = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {vehicleToDelete && (
+        <div
+          className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4"
+          onClick={() => setVehicleToDelete(null)}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="delete-vehicle-title"
+            className="bg-[#0e1726] border border-rose-900/60 rounded-2xl w-full max-w-md p-6 space-y-5 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div>
+              <h3 id="delete-vehicle-title" className="font-bold text-lg text-white">
+                Delete vehicle?
+              </h3>
+              <p className="mt-2 text-sm text-slate-300">
+                Delete <strong>{vehicleToDelete.name}</strong> ({vehicleToDelete.plateNumber}) from your fleet?
+                Existing bookings will remain in your records.
+              </p>
+            </div>
+            <div className="flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setVehicleToDelete(null)}
+                className="px-4 py-2.5 rounded-xl border border-[#1f2e46] text-xs font-bold text-slate-300 hover:text-white"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={async () => {
+                  const deleted = await deleteVehicle(vehicleToDelete.id);
+                  if (deleted) setVehicleToDelete(null);
+                }}
+                className="px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold"
+              >
+                Delete Vehicle
+              </button>
+            </div>
           </div>
         </div>
       )}

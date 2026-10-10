@@ -14,6 +14,8 @@ import {
   Printer,
   Trash2,
   RefreshCcw,
+  Plus,
+  CarFront,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { Booking, VehicleCategory } from '../types';
@@ -26,6 +28,7 @@ export const DashboardView: React.FC = () => {
     bookings,
     searchQuery,
     setCurrentTab,
+    setIsAddVehicleOpen,
     setActiveBookingModal,
     setActiveAgreementModal,
     setActiveReceiptModal,
@@ -131,8 +134,24 @@ export const DashboardView: React.FC = () => {
     setIsLogReturnOpen(true);
   };
 
+  const openAddVehicle = () => {
+    setCurrentTab('fleet');
+    setIsAddVehicleOpen(true);
+  };
+
   return (
     <div className="p-8 space-y-6">
+      <div className="flex justify-end">
+        <button
+          type="button"
+          onClick={openAddVehicle}
+          className="px-4 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold shadow-md shadow-cyan-950/40 transition-colors flex items-center gap-2"
+        >
+          <Plus className="w-4 h-4" />
+          <span>Add Vehicle</span>
+        </button>
+      </div>
+
       {/* 4 Metric KPI Cards (matching Screenshot 4) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Card 1: Active Rentals Out */}
@@ -356,15 +375,29 @@ export const DashboardView: React.FC = () => {
                           </div>
                           <p className="text-sm font-bold text-white">Fresh Start — 0 Active Rentals</p>
                           <p className="text-xs text-slate-400 leading-relaxed">
-                            All fleet vehicles are available and ready. Cash collected &amp; operational income starts at 0.
+                            {vehicles.length === 0
+                              ? 'Add a vehicle to your fleet before creating your first booking.'
+                              : 'All fleet vehicles are available and ready. Cash collected & operational income starts at 0.'}
                           </p>
-                          <button
-                            type="button"
-                            onClick={() => setCurrentTab('new-booking')}
-                            className="mt-2 px-4 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold transition-all shadow-md shadow-cyan-950/40"
-                          >
-                            + Create First Booking
-                          </button>
+                          <div className="mt-2 flex flex-wrap items-center justify-center gap-2">
+                            {vehicles.length === 0 && (
+                              <button
+                                type="button"
+                                onClick={openAddVehicle}
+                                className="px-4 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold transition-all shadow-md shadow-cyan-950/40 flex items-center gap-1.5"
+                              >
+                                <CarFront className="w-3.5 h-3.5" />
+                                Add Your First Vehicle
+                              </button>
+                            )}
+                            <button
+                              type="button"
+                              onClick={() => setCurrentTab('new-booking')}
+                              className="px-4 py-2 rounded-xl bg-[#142136] hover:bg-[#1b2d48] border border-[#203450] text-slate-200 text-xs font-bold transition-all"
+                            >
+                              + Create First Booking
+                            </button>
+                          </div>
                         </div>
                       </td>
                     </tr>

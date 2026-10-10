@@ -28,6 +28,7 @@ export const NewBookingView: React.FC = () => {
     tours,
     createBooking,
     setCurrentTab,
+    setIsAddVehicleOpen,
     setActiveAgreementModal,
     setActiveReceiptModal,
     selectedDayFolder,
@@ -274,6 +275,11 @@ export const NewBookingView: React.FC = () => {
     setActiveReceiptModal(newBooking);
   };
 
+  const openAddVehicle = () => {
+    setCurrentTab('fleet');
+    setIsAddVehicleOpen(true);
+  };
+
   return (
     <div className="p-8 space-y-6 max-w-7xl mx-auto">
       {/* Category Switcher Tabs (matches Screenshot 3) */}
@@ -331,6 +337,22 @@ export const NewBookingView: React.FC = () => {
               <label className="text-xs font-semibold text-slate-300">
                 {activeCategory === 'tours' ? 'Tour Experience' : 'Vehicle'}
               </label>
+              {activeCategory !== 'tours' &&
+              !vehicles.some((vehicle) => vehicle.category === activeCategory) ? (
+                <div className="rounded-xl border border-amber-700/40 bg-amber-950/20 p-4 space-y-3">
+                  <p className="text-xs text-amber-200">
+                    No {activeCategory === 'bikes' ? 'bikes or scooters' : 'cars or vans'} have been added to your fleet yet.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={openAddVehicle}
+                    className="px-3 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold flex items-center gap-1.5"
+                  >
+                    <CarFront className="w-3.5 h-3.5" />
+                    Add a Vehicle
+                  </button>
+                </div>
+              ) : (
               <div className="relative">
                 <select
                   value={selectedVehicleId}
@@ -355,6 +377,7 @@ export const NewBookingView: React.FC = () => {
                   ▼
                 </div>
               </div>
+              )}
 
               {/* Selected Vehicle Quick Preview */}
               {selectedVehicle && (

@@ -41,3 +41,24 @@ The optional `scripts/clearBookings.js` utility also uses Supabase. To run it,
 add `SUPABASE_STAFF_EMAIL` and `SUPABASE_STAFF_PASSWORD` to `.env.local`, then
 run `node scripts/clearBookings.js --confirm`. The confirmation flag is
 required because the utility deletes all bookings and finance records.
+
+### Troubleshooting missing tables
+
+If the app reports that it could not find `public.vehicles` (or another rental
+table) in the schema cache, run the complete migration from step 2 in the SQL
+Editor for the same project URL configured in `.env.local`. If the tables are
+already present, refresh the PostgREST schema cache in that project's SQL
+Editor:
+
+```sql
+notify pgrst, 'reload schema';
+```
+
+### Troubleshooting row-level security errors
+
+If a save reports `new row violates row-level security policy`, the signed-in
+account is not authorized for the rental workspace. In the SQL Editor for the
+same Supabase project, run the staff authorization query from step 3 using the
+email address of the account you signed in with. The app intentionally keeps
+row-level security enabled and does not grant access to every authenticated
+account. Refresh the app after authorizing the account.

@@ -17,7 +17,7 @@ import {
   Upload,
   Image as ImageIcon,
 } from 'lucide-react';
-import { Vehicle, VehicleStatus } from '../types';
+import { Vehicle, VehicleCategory, VehicleStatus } from '../types';
 import { useApp } from '../context/AppContext';
 import { formatCurrency, formatDate, getDocumentExpiryStatus } from '../utils/formatters';
 
@@ -36,6 +36,7 @@ export const VehicleProfileModal: React.FC<Props> = ({ vehicle, onClose }) => {
   // Form State
   const [formData, setFormData] = useState({
     name: vehicle.name,
+    category: vehicle.category,
     plateNumber: vehicle.plateNumber,
     dailyRate: vehicle.dailyRate,
     status: vehicle.status,
@@ -79,6 +80,7 @@ export const VehicleProfileModal: React.FC<Props> = ({ vehicle, onClose }) => {
     e.preventDefault();
     const saved = await updateVehicle(vehicle.id, {
       name: formData.name,
+      category: formData.category,
       plateNumber: formData.plateNumber,
       dailyRate: Number(formData.dailyRate),
       status: formData.status as VehicleStatus,
@@ -343,7 +345,7 @@ export const VehicleProfileModal: React.FC<Props> = ({ vehicle, onClose }) => {
         ) : (
           /* Edit Form */
           <form onSubmit={handleSave} className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="space-y-1.5">
                 <label className="text-xs font-semibold text-slate-300">Vehicle Name & Model</label>
                 <input
@@ -366,6 +368,23 @@ export const VehicleProfileModal: React.FC<Props> = ({ vehicle, onClose }) => {
                   }
                   className="w-full bg-[#121c2d] border border-[#1f2e46] rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-cyan-500 font-mono"
                 />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-slate-300">Vehicle Type</label>
+                <select
+                  value={formData.category}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      category: e.target.value as VehicleCategory,
+                    }))
+                  }
+                  className="w-full bg-[#121c2d] border border-[#1f2e46] rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-cyan-500"
+                >
+                  <option value="bikes">Bike / Scooty</option>
+                  <option value="cars">Car / Van</option>
+                </select>
               </div>
             </div>
 

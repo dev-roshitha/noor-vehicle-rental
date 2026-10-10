@@ -48,6 +48,8 @@ interface AppContextType {
   clearDataError: () => void;
   currentTab: NavTab;
   setCurrentTab: (tab: NavTab) => void;
+  isAddVehicleOpen: boolean;
+  setIsAddVehicleOpen: (open: boolean) => void;
   vehicles: Vehicle[];
   bookings: Booking[];
   tours: TourPackage[];
@@ -94,7 +96,17 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 const LEGACY_STORAGE_PREFIX = 'noor_kandy_clean_start_v5_';
 
 function getErrorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : String(error);
+  const message = error instanceof Error ? error.message : String(error);
+  if (/new row violates row-level security policy/i.test(message)) {
+    return `${message} The signed-in account is not authorized for this rental workspace. In the Supabase SQL Editor, authorize the account's email using the staff authorization SQL in README.md (step 3), then retry.`;
+  }
+
+  const missingTable = message.match(
+    /Could not find the table ['"]public\.([a-z_][a-z0-9_]*)['"] in the schema cache/i
+  );
+  if (!missingTable) return message;
+
+  return `${message} The Supabase rental tables are missing or not available to the API. In the SQL Editor for the project configured by VITE_SUPABASE_URL, run supabase/migrations/20261008000000_create_rental_tables.sql. If the tables already exist, run NOTIFY pgrst, 'reload schema'; and verify the project URL.`;
 }
 
 function newRecordId(prefix: string): string {
@@ -132,6 +144,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [supabaseConnected, setSupabaseConnected] = useState(false);
   const [dataError, setDataError] = useState<string | null>(null);
   const [currentTab, setCurrentTab] = useState<NavTab>('dashboard');
+  const [isAddVehicleOpen, setIsAddVehicleOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedDayFolder, setSelectedDayFolder] = useState('2026-10-03');
   const [activeBookingModal, setActiveBookingModal] = useState<Booking | null>(null);
@@ -648,6 +661,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         clearDataError: () => setDataError(null),
         currentTab,
         setCurrentTab,
+        isAddVehicleOpen,
+        setIsAddVehicleOpen,
         vehicles,
         bookings,
         tours,
